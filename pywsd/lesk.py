@@ -73,7 +73,7 @@ def compare_overlaps_greedy(context, synsets_signatures):
             max_overlaps = len(overlaps)    
     return lesk_sense
 
-def compare_overlaps(context, synsets_signatures, \
+def compare_overlaps(context, ambiguous_word, synsets_signatures, \
                      nbest=False, keepscore=False, normalizescore=False):
     """ 
     Calculates overlaps between the context sentence and the synset_signture
@@ -83,24 +83,45 @@ def compare_overlaps(context, synsets_signatures, \
     for ss in synsets_signatures:
         overlaps = set(synsets_signatures[ss]).intersection(context)
         overlaplen_synsets.append((len(overlaps), ss))
-    
+
     # Rank synsets from highest to lowest overlap.
     ranked_synsets = sorted(overlaplen_synsets, reverse=True)
-    
+
     # Normalize scores such that it's between 0 to 1. 
     if normalizescore:
         total = float(sum(i[0] for i in ranked_synsets))
         ranked_synsets = [(i/total,j) for i,j in ranked_synsets]
-      
-    if not keepscore: # Returns a list of ranked synsets without scores
-        ranked_synsets = [i[1] for i in sorted(overlaplen_synsets, \
-                                               reverse=True)]
 
 
     if nbest: # Returns a ranked list of synsets.
+        if not keepscore:
+            ranked_synsets = [i[1] for i in sorted(overlaplen_synsets, \
+                                                   reverse=True)]
         return ranked_synsets
     else: # Returns only the best sense.
-        return ranked_synsets[0] if len(ranked_synsets) > 0 else None
+        if len(ranked_synsets) == 0:
+            return None
+        tiebroken = tiebreak(ambiguous_word, ranked_synsets)
+        if not keepscore:
+            return tiebroken[1]
+        else:
+            return tiebroken
+
+def tiebreak(ambiguous_word, ranked_synsets):  # use ambiguous word as a tiebreaker
+    first_ranked = ranked_synsets[0]
+    most_overlaps = first_ranked[0]
+
+    for ranked_ss in ranked_synsets:
+        if ranked_ss[0] < most_overlaps:
+            return first_ranked # highest overlap
+        else: # equal
+            if ranked_ss[1].name == ambiguous_word + '.n.01': # if the most common sense is tied, use that
+                return ranked_ss
+            if ranked_ss[1].name.startswith(ambiguous_word + '.n.'): # otherwise any sense  which has the word in it's name
+                first_ranked = ranked_ss
+
+    return first_ranked
+
 
 def original_lesk(context_sentence, ambiguous_word, dictionary=None):
     """
@@ -155,6 +176,9 @@ def simple_signature(ambiguous_word, pos=None, stem=True, \
         # Matching exact words causes sparsity, so optional matching for stems.
         if stem == True: 
             signature = [porter.stem(i) for i in signature]
+
+        signature = [i.lower() for i in signature]
+
         synsets_signatures[ss] = signature
     return synsets_signatures
 
@@ -172,7 +196,7 @@ def simple_lesk(context_sentence, ambiguous_word, \
     ss_sign = simple_signature(ambiguous_word, pos, stem, hyperhypo)
     # Disambiguate the sense in context.
     context_sentence = [porter.stem(i.lower()) for i in context_sentence.split()]
-    best_sense = compare_overlaps(context_sentence, ss_sign, \
+    best_sense = compare_overlaps(context_sentence, ambiguous_word, ss_sign, \
                                     nbest=nbest, keepscore=keepscore, \
                                     normalizescore=normalizescore)  
     return best_sense
@@ -210,7 +234,7 @@ def adapted_lesk(context_sentence, ambiguous_word, \
   
     # Disambiguate the sense in context.
     context_sentence = [porter.stem(i) for i in context_sentence.split()]
-    best_sense = compare_overlaps(context_sentence, ss_sign, \
+    best_sense = compare_overlaps(context_sentence, ambiguous_word, ss_sign, \
                                     nbest=nbest, keepscore=keepscore, \
                                     normalizescore=normalizescore)
     return best_sense
