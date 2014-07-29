@@ -95,11 +95,12 @@ def compare_overlaps(context, synsets_signatures, \
     if not keepscore: # Returns a list of ranked synsets without scores
         ranked_synsets = [i[1] for i in sorted(overlaplen_synsets, \
                                                reverse=True)]
-      
+
+
     if nbest: # Returns a ranked list of synsets.
         return ranked_synsets
     else: # Returns only the best sense.
-        return ranked_synsets[0]
+        return ranked_synsets[0] if len(ranked_synsets) > 0 else None
 
 def original_lesk(context_sentence, ambiguous_word, dictionary=None):
     """
@@ -170,7 +171,7 @@ def simple_lesk(context_sentence, ambiguous_word, \
     # Get the signatures for each synset.
     ss_sign = simple_signature(ambiguous_word, pos, stem, hyperhypo)
     # Disambiguate the sense in context.
-    context_sentence = [porter.stem(i) for i in context_sentence.split()]
+    context_sentence = [porter.stem(i.lower()) for i in context_sentence.split()]
     best_sense = compare_overlaps(context_sentence, ss_sign, \
                                     nbest=nbest, keepscore=keepscore, \
                                     normalizescore=normalizescore)  
