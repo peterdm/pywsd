@@ -191,7 +191,7 @@ def simple_lesk(context_sentence, ambiguous_word, \
     words than adapted Lesk (Banerjee and Pederson, 2002)
     """
     # Ensure that ambiguous word is a lemma.
-    ambiguous_word = lemmatize(ambiguous_word) 
+    ambiguous_word = lemmatize(ambiguous_word).lower()
     # Get the signatures for each synset.
     ss_sign = simple_signature(ambiguous_word, pos, stem, hyperhypo)
     # Disambiguate the sense in context.

@@ -1,7 +1,7 @@
 #!/usr/bin/env python -*- coding: utf-8 -*-
 
-bank_sents = ['I went to the bank to deposit my money',
-'The river bank was full of dead fishes']
+bank_sents = ['Animals & Pet Supplies Pet Supplies Pet Collars & Harnesses Cat Collars & Harnesses',
+'Holidays Easter Candy']
 
 plant_sents = ['The workers at the industrial plant were overworked',
 'The plant was no longer bearing flowers']
@@ -18,13 +18,24 @@ print "Definition:", definition
 print
 
 print "#TESTING simple_lesk() with POS ..."
-print "Context:", bank_sents[1]
-answer = simple_lesk(bank_sents[1],'bank','n')
+print "Context:", bank_sents[0]
+answer = simple_lesk(bank_sents[0],'Cat','n')
 print "Sense:", answer
 try: definition = answer.definition() 
 except: definition = answer.definition # Using older version of NLTK.
 print "Definition:", definition
 print
+
+print "#TESTING simple_lesk() with POS ..."
+print "Context:", bank_sents[1]
+answer = simple_lesk(bank_sents[1],'easter','n')
+print "Sense:", answer
+try: definition = answer.definition() 
+except: definition = answer.definition # Using older version of NLTK.
+print "Definition:", definition
+print
+
+exit()
 
 print "#TESTING simple_lesk() with POS and stems ..."
 print "Context:", plant_sents[0]
