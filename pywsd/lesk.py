@@ -80,9 +80,9 @@ def tiebreak(ambiguous_word, ranked_synsets):  # use ambiguous word as a tiebrea
         if ranked_ss[0] < most_overlaps:
             return first_ranked # highest overlap
         else: # equal
-            if ranked_ss[1].name == ambiguous_word + '.n.01': # if the most common sense is tied, use that
+            if ranked_ss[1].name() == ambiguous_word + '.n.01': # if the most common sense is tied, use that
                 return ranked_ss
-            if ranked_ss[1].name.startswith(ambiguous_word + '.n.'): # otherwise any sense  which has the word in it's name
+            if ranked_ss[1].name().startswith(ambiguous_word + '.n.'): # otherwise any sense  which has the word in it's name
                 first_ranked = ranked_ss
 
     return first_ranked
