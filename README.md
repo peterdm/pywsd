@@ -1,8 +1,6 @@
 pywsd
 =====
 
- **NEW!!!** (03.04.14): WSD by maximizing sense similarity with various similarity measures.
-
 Python Implementations of Word Sense Disambiguation (WSD) technologies:
 
 * **Lesk algorithms**
@@ -10,18 +8,25 @@ Python Implementations of Word Sense Disambiguation (WSD) technologies:
   * Adapted/Extended Lesk (Banerjee and Pederson, 2002/2003)
   * Simple Lesk (with definition, example(s) and hyper+hyponyms)
   * Cosine Lesk (use cosines to calculate overlaps instead of using raw counts)
+  * Enhanced Lesk (Basile et al. 2014) (in wishlist)
+  
 * **Maximizing Similarity** (see also, http://goo.gl/MG8ZpE)
   * Path similarity (Wu-Palmer, 1994; Leacock and Chodorow, 1998)
   * Information Content (Resnik, 1995; Jiang and Corath, 1997; Lin, 1998)
+  
 * **Supervised WSD** (in progress)
   * SVM WSD (Lee, Ng and Chia 2004)
   * It Makes Sense (IMS) (Zhong and Ng, 2010) 
+ 
 * **Vector Space Models** (in progress)
   * LSI/LSA
   * Topic Models, LDA (Li et al. 2012)
   * NMF
+
 * **Graph based Models** (in wishlist)
   * Babelfly (Moro et al. 2014)
+  * UKB (Agirre and Soroa, 2009)
+
 * **Baselines**
   * Random sense
   * First NLTK sense
@@ -29,15 +34,18 @@ Python Implementations of Word Sense Disambiguation (WSD) technologies:
 
 (**NOTE**: requires `NLTK`, goto http://nltk.org/install.html. Also, note that as of 30.10.13, NLTK has changed `Synset` object properties to methods, see http://goo.gl/hO79KO)
 
+As a bonus, `pyWSD` comes with an almost native python implementations of several classification algorithms within the `Merlin` machine learning library, see https://github.com/alvations/pywsd/tree/master/merlin
+
 
 ***
 Usage
 =====
 
 ```
-$ cd pywsd/
+$ git clone https://github.com/alvations/pywsd.git 
+$ cd pywsd
 $ ls
-baseline.py   cosine.py   lesk.py   README.md   test_wsd.py
+pywsd  README.md  test_wsd.py
 $ python
 >>> from pywsd.lesk import simple_lesk
 >>> sent = 'I went to the bank to deposit my money'
@@ -47,28 +55,17 @@ $ python
 Synset('depository_financial_institution.n.01')
 >>> print answer.definition()
 a financial institution that accepts deposits and channels the money into lending activities
-
 ```
 
-***
-Change Log
-=====
-
-**29.05.14** (user request):
-* Automatically lemmatize `ambiguous_word` parameter because without it being a lemma, `wn.synsets(ambiguous_word)` breaks the system.
-
-**15.05.14** (bugfix):
-* Added try-excepts to allow old NLTK Synset properties.
-
-**15.04.14**: 
-
-* Changed `Synset` properties to methods adhering to new `NLTK` version (see see http://goo.gl/hO79KO)
-* Added N-best results, `pywsd` now outputs ranked list of synsets (possible with normalized scores too), see test_wsd.py
-
-
-**03.04.14**:
-* Added similarity based WSD methods.
-
+For all-words WSD, try:
+```
+>>> from pywsd import disambiguate
+>>> from pywsd.similarity import max_similarity as maxsim
+>>> disambiguate('I went to the bank to deposit my money')
+[('I', None), ('went', Synset('run_low.v.01')), ('to', None), ('the', None), ('bank', Synset('depository_financial_institution.n.01')), ('to', None), ('deposit', Synset('deposit.v.02')), ('my', None), ('money', Synset('money.n.03'))]
+>>> disambiguate('I went to the bank to deposit my money', algorithm=maxsim, similarity_option='wup', keepLemmas=True)
+[('I', 'i', None), ('went', u'go', Synset('sound.v.02')), ('to', 'to', None), ('the', 'the', None), ('bank', 'bank', Synset('bank.n.06')), ('to', 'to', None), ('deposit', 'deposit', Synset('deposit.v.02')), ('my', 'my', None), ('money', 'money', Synset('money.n.01'))]
+```
 
 ***
 Cite
@@ -89,7 +86,31 @@ year = {2014}
 }
 ```
 
+***
+License
+====
 
+The MIT License (MIT)
+
+Copyright (c) 2014-2015 alvations
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
 
 ***
 References
@@ -117,4 +138,7 @@ Joint Conference on Artificial Intelligence, pages 805–810, Acapulco.
 * Zhi Zhong and Hwee Tou Ng. 2010. It makes sense: a wide-coverage word sense disambiguation system for free text. In Proceedings of the ACL 2010 System Demonstrations (ACLDemos '10). Association for Computational Linguistics, Stroudsburg, PA, USA, 78-83.
 
 * Steven Bird, Ewan Klein, and Edward Loper. 2009. Natural Language Processing with Python (1st ed.). O'Reilly Media, Inc..
+
+* Eneko Agirre and Aitor Soroa. 2009. Personalizing PageRank for Word Sense Disambiguation. Proceedings of the 12th conference of the European chapter of the Association for Computational Linguistics (EACL-2009). Athens, Greece. 
+
 

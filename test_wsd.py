@@ -1,4 +1,10 @@
 #!/usr/bin/env python -*- coding: utf-8 -*-
+#
+# Python Word Sense Disambiguation (pyWSD): WSD function tests
+#
+# Copyright (C) 2014-2015 alvations
+# URL:
+# For license information, see LICENSE.md
 
 bank_sents = ['Animals & Pet Supplies Pet Supplies Pet Collars & Harnesses Cat Collars & Harnesses',
 'Holidays Easter Candy']
